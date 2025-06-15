@@ -16,5 +16,4 @@ COPY . .
 # Expose the port your app runs on (from .env)
 EXPOSE 3000
 
-# Start the Node.js app
 CMD [ "node", "server.js" ]

@@ -3,50 +3,55 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        TF_VAR_aws_access_key = credentials('aws-access-key')
-        TF_VAR_aws_secret_key = credentials('aws-secret-key')
+        IMAGE_NAME = 'nodejs-app'
+        ECR_REPO = '211125346130.dkr.ecr.us-east-1.amazonaws.com/task/node-app'
+        DOCKER_IMAGE = "${ECR_REPO}:latest"
     }
 
     stages {
-        stage('Initialize Terraform') {
+        stage('Checkout') {
             steps {
-                dir('terraform') {
-                    sh 'terraform init'
-                }
+                git branch: 'main', url: 'https://github.com/osamasaeed88/hello-world-nodejs.git'
             }
         }
 
-        stage('Validate Terraform') {
+        stage('Build App') {
             steps {
-                dir('terraform') {
-                    sh 'terraform validate'
-                }
+                sh 'npm install'
             }
         }
 
-        stage('Plan Terraform') {
+        stage('Unit Test') {
             steps {
-                dir('terraform') {
-                    sh 'terraform plan -out=tfplan'
-                }
+                sh 'npm test' // or your test command
             }
         }
 
-        stage('Apply Terraform') {
+        stage('Build Docker Image') {
             steps {
-                dir('terraform') {
-                    sh 'terraform apply -auto-approve tfplan'
-                }
+                sh "docker build -t ${IMAGE_NAME} ."
             }
         }
-    }
 
-    post {
-        failure {
-            echo "Terraform provisioning failed."
+        stage('Login to ECR') {
+            steps {
+                sh 'aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO'
+            }
         }
-        success {
-            echo "Terraform provisioning succeeded."
+
+        stage('Push to ECR') {
+            steps {
+                sh """
+                    docker tag ${IMAGE_NAME}:latest ${DOCKER_IMAGE}
+                    docker push ${DOCKER_IMAGE}
+                """
+            }
+        }
+
+        stage('Trigger Ansible Deployment') {
+            steps {
+                sh 'ansible-playbook -i inventory deploy.yml'
+            }
         }
     }
 }

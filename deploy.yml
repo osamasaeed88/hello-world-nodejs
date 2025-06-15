@@ -11,9 +11,11 @@
 
   tasks:
     - name: Install Docker
-      amazon.aws.package:
+      become: yes
+      apt:
         name: docker
         state: present
+        update_cache: yes
 
     - name: Start and enable Docker service
       ansible.builtin.service:

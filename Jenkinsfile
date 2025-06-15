@@ -50,7 +50,10 @@ pipeline {
 
         stage('Trigger Ansible Deployment') {
             steps {
-                sh 'ansible-playbook -i inventory deploy.yml'
+                sh '''
+                   export ANSIBLE_HOST_KEY_CHECKING=False
+                   ansible-playbook -i inventory deploy.yml
+                '''
             }
         }
     }

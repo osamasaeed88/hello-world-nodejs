@@ -11,9 +11,8 @@
 
   tasks:
     - name: Install Docker
-      become: yes
       apt:
-        name: docker
+        name: docker.io
         state: present
         update_cache: yes
 
@@ -39,15 +38,22 @@
       shell: docker pull {{ ecr_repo }}:{{ image_tag }}
 
     - name: Stop existing container (if running)
-      shell: docker rm -f {{ container_name }}
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
       ignore_errors: yes
 
     - name: Run Docker container
-      shell: >
-        docker run -d --name {{ container_name }}
-        -p 80:3000 {{ ecr_repo }}:{{ image_tag }}
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ ecr_repo }}:{{ image_tag }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "80:3000"
 
     - name: Ensure container is running
       shell: docker ps -q -f name={{ container_name }}
       register: container_status
       failed_when: container_status.stdout == ""
+

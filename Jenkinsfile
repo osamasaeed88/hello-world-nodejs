@@ -52,7 +52,7 @@ pipeline {
             steps {
                 sh '''
                   bash -c "
-                   source ~/.ansible-venv/bin/activate
+                   . /var/lib/jenkins/.ansible-venv/bin/activate
                    export ANSIBLE_HOST_KEY_CHECKING=False
                    ansible-playbook -i inventory bootstrap.yml
                    ansible-playbook -i inventory deploy.yml

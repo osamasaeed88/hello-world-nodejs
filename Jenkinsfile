@@ -23,7 +23,7 @@ pipeline {
 
         stage('Unit Test') {
             steps {
-                sh 'npm run test' // or your test command
+                sh 'npm test' // or your test command
             }
         }
 

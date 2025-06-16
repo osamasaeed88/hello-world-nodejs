@@ -1,6 +1,6 @@
 ---
 - name: Deploy Node.js app from ECR
-  hosts: app-server
+  hosts: app-servers
   become: yes
 
   vars:

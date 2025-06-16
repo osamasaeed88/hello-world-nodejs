@@ -1,6 +1,6 @@
 ---
 - name: Bootstrap EC2 instances for Ansible
-  hosts: app-server
+  hosts: app-servers
   become: yes
 
   tasks:

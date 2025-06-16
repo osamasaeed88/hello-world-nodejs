@@ -18,10 +18,8 @@
         state: present
         update_cache: yes
 
-    - name: Install six module using pip
-      pip:
-        name: six
-        executable: pip3
+    - name: Install six Python module
+      command: pip3 install six --break-system-packages
 
     - name: Install Docker
       apt:

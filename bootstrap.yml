@@ -13,6 +13,5 @@
         update_cache: yes
 
     - name: Install six Python module
-      pip:
-        name: six
-        executable: pip3
+      command: pip3 install six --break-system-packages
+
